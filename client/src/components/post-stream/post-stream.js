@@ -8,7 +8,8 @@ export default class PostStream extends Component {
         this.state = {
             streamName: '',
             url: '',
-            errors: ''
+            errors: '',
+            response: ''
         };
 
         this.handleChange = this.handleInputChange.bind(this);
@@ -29,7 +30,7 @@ export default class PostStream extends Component {
     handleSubmit(event) {
         console.log('A form was submitted: ' + this.state.streamName + ' // ' + this.state.url);
         event.preventDefault();
-        this.PostStream();
+        this.CallPostStream();
     }
 
     renderErrors() {
@@ -40,19 +41,24 @@ export default class PostStream extends Component {
         );
     }
 
-    async PostStream() {
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ streamName: this.state.streamName, url: this.state.url })
-        };
-        const response = await fetch('http://localhost:3001/stream', requestOptions);
-       // this.setState({
-       //     parseErrors: [...this.state.parseErrors, errorMsg]
-       // });
+    async CallPostStream() {
+        try {
+            const requestOptions = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ streamName: this.state.streamName, url: this.state.url })
+            };
 
-        console.log(response);
-        const data = await response.json();
+            const response = await fetch('http://localhost:8080/stream', requestOptions);
+            this.setState({
+                response: response
+            });
+        }
+        catch (ex) {
+            this.setState({
+                response: ex.message
+            });
+        }
     }
 
     render() {
@@ -60,7 +66,7 @@ export default class PostStream extends Component {
             <div>
                 <form onSubmit={this.handleSubmit} >
                     <div className="form-group">
-                        <label for="nameImput">Stream Name</label>
+                        <label for="nameImput">[POST /Stream:]  Name</label>
                         <input type="text" name="streamName" value={this.state.streamName} onChange={this.handleChange} className="form-control" id="nameImput" placeholder="Stream Name" />
                     </div>
                     <div className="form-group">
@@ -69,6 +75,7 @@ export default class PostStream extends Component {
                     </div>
                     <input type="submit" value="Submit" className="btn btn-primary" />
                 </form>
+                <p>{this.state.response}</p>
             </div>
         )
     }

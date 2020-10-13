@@ -46,6 +46,7 @@ void handler::handle_get_stream_name(http_request &message, std::string &name) {
   json::value jsonresponse;
   if (cache.find(name) != cache.end()) {
     if (cache[name].status == 0) {
+      // rtmp
       std::string cmd =
           "ffmpeg -re -stream_loop -1 -i " + cache[name].filepath +
           " -map 0 -c copy -f flv rtmp://localhost/stream/" + name + " &";
@@ -54,8 +55,19 @@ void handler::handle_get_stream_name(http_request &message, std::string &name) {
         cache[name].status = 1;
         cache[name].rtmp = ("rtmp://localhost:1935/stream/" + name);
       }
+
+      // rtsp
+      cmd =
+          "ffmpeg -re -stream_loop -1 -i " + cache[name].filepath +
+          " -map 0 -c copy -f rtsp -rtsp_transport tcp rtsp://localhost:8554/" +
+          name + " &";
+      status = system(cmd.c_str());
+      if (status == 0) {
+        cache[name].status = 1;
+        cache[name].rtsp = ("rtsp://localhost:8554/" + name);
+      }
     }
-    jsonresponse[name] = json::value::string(name);
+    jsonresponse["name"] = json::value::string(name);
     jsonresponse["url"] = json::value::string(cache[name].url);
     jsonresponse["rtmp"] = json::value::string(cache[name].rtmp);
     jsonresponse["rtsp"] = json::value::string(cache[name].rtsp);
@@ -89,11 +101,21 @@ void handler::handle_post_stream(http_request message) {
       if (status == 0) {
 
         std::string filename = url.substr(url.find_last_of("/\\") + 1);
+        std::string ext = filename.substr(filename.find_last_of(".") + 1);
+        std::string woext =  filename.substr(0, filename.find_last_of("."));
+        std::cout<<filename<<":"<<ext<<":"<<woext<<std::endl;
+        if(ext == "png" || ext == "jpeg" || ext == "jpg") {
+          cmd = "ffmpeg -r 1/25 -i /var/www/" + filename + " -c:v libx264 -vf fps=25 -pix_fmt yuv420p /var/www/" + woext + ".mp4";
+          std::cout<<cmd<<std::endl;
+          status = system(cmd.c_str());
+          if(status == 0) {
+            filename = woext + ".mp4";
+          }
+        }
         std::string filepath = "/var/www/" + filename;
-        std::cout << "path: " << filepath << std::endl;
+      
         VIDEO_DETAILS v(name, url, "", "", filepath, 0);
         cache[name] = v;
-        std::cout << "status: " << status << std::endl;
         jsonresponse[U("success")] = json::value::string(U("true"));
         message.reply(status_codes::OK, jsonresponse);
         return;

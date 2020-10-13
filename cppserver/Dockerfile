@@ -41,21 +41,23 @@ RUN ./configure --add-module=/src/nginx-rtmp-module-1.1.6 \
 
 ADD nginx/nginx.conf /config/nginx.conf
 
-
 WORKDIR /
-
-
 
 RUN apt-get update -y && apt-get install -y g++ make wget libboost-all-dev git
 RUN wget https://cmake.org/files/v3.9/cmake-3.9.4.tar.gz && tar xvzf cmake-3.9.4.tar.gz && cd cmake-3.9.4 && ./bootstrap && make && make install && cd .. && rm -rf cmake-3.9.4
 RUN apt-get install -y libssl-dev
 RUN mkdir -p app/libs
+RUN mkdir -p app/rtsp
 ADD libs/build_dependencies.sh app/libs
+ADD bin/rtsp-simple-server app/rtsp
+ADD bin/rtsp-simple-server.yml app/rtsp
 RUN cd app/libs && ./build_dependencies.sh
 ADD . /app
 RUN cd /app && ls -la && cmake . && cmake --build .
 EXPOSE 8080
 EXPOSE 1935
+EXPOSE 8554
+EXPOSE 554
 
 ADD libs/entry.sh app/
 CMD ./app/entry.sh

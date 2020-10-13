@@ -4,5 +4,8 @@
 echo "Running nginx"
 /usr/local/nginx/sbin/nginx &
 
+echo "Running rtsp server"
+/app/rtsp/rtsp-simple-server &
+
 echo "Running app"
-/app/crest 8080 -D 
+/app/crest 8080 -D
