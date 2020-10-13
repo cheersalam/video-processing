@@ -54,7 +54,7 @@ ADD bin/rtsp-simple-server.yml app/rtsp
 RUN cd app/libs && ./build_dependencies.sh
 ADD . /app
 RUN cd /app && ls -la && cmake . && cmake --build .
-EXPOSE 8080
+EXPOSE 3001
 EXPOSE 1935
 EXPOSE 8554
 EXPOSE 554

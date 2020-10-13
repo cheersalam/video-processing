@@ -49,7 +49,7 @@ export default class PostStream extends Component {
                 body: JSON.stringify({ streamName: this.state.streamName, url: this.state.url })
             };
 
-            const response = await fetch('http://localhost:8080/stream', requestOptions);
+            const response = await fetch('http://localhost:3001/stream', requestOptions);
             this.setState({
                 response: response
             });

@@ -47,7 +47,7 @@ export default class GetStreamName extends Component {
                 method: 'GET',
             };
 
-            const response = await fetch(`http://localhost:8080/stream/${this.state.name}`, requestOptions);
+            const response = await fetch(`http://localhost:3001/stream/${this.state.name}`, requestOptions);
             this.setState({
                 response: response
             });

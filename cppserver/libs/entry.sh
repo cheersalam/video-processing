@@ -8,4 +8,4 @@ echo "Running rtsp server"
 /app/rtsp/rtsp-simple-server &
 
 echo "Running app"
-/app/crest 8080 -D
+/app/crest 3001 -D

@@ -30,7 +30,7 @@ void on_shutdown(int signal) {
 }
 
 int main(int argc, char *argv[]) {
-    utility::string_t port = U("8080");
+    utility::string_t port = U("3001");
     if (argc == 2) {
         port = argv[1];
     }
