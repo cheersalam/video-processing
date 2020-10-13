@@ -9,17 +9,14 @@ services:
       - ./client:/app
     ports:
       - '3000:80'
-      - '1935:1935'
     restart: on-failure
-    container_name: web-app
+    container_name: client
   to-do-api:
-    build:
-      context: ./server
-      dockerfile: Dockerfile
+    build: ./cppserver
     ports:
       - '3001:3001'
+      - '1935:1935'
+      - '8080:8080'
+      - '8554:8554'
     restart: on-failure
-    container_name: to-do-api
-    volumes:
-      - /app/node_modules # Inside the container, don't try to override this folder, just leave as is
-      - ./server:/app # Look at the server directory and copy everything into the app folder in the container
+    container_name: cppserver
