@@ -43,7 +43,7 @@ ADD nginx/nginx.conf /config/nginx.conf
 
 
 WORKDIR /
-CMD "nginx"
+
 
 
 RUN apt-get update -y && apt-get install -y g++ make wget libboost-all-dev git
@@ -55,4 +55,9 @@ RUN cd app/libs && ./build_dependencies.sh
 ADD . /app
 RUN cd /app && ls -la && cmake . && cmake --build .
 EXPOSE 8080
-ENTRYPOINT ["bash", "-c", "./app/crest 8080"]
+EXPOSE 1935
+
+ADD libs/entry.sh app/
+CMD ./app/entry.sh
+#CMD ["nginx", "-g", "daemon off;"]
+#ENTRYPOINT ["bash", "-c", "./app/crest 8080"]

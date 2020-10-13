@@ -1,5 +1,4 @@
 #include "../include/handler.h"
- 
 
 handler::handler(utility::string_t url) : listener(url) {
   listener.support(methods::GET, std::bind(&handler::handle_get, this,
@@ -49,18 +48,17 @@ void handler::handle_get_stream_name(http_request &message, std::string &name) {
     if (cache[name].status == 0) {
       std::string cmd =
           "ffmpeg -re -stream_loop -1 -i " + cache[name].filepath +
-          " -map 0 -c copy -f flv rtmp://localhost/stream/" + name;
+          " -map 0 -c copy -f flv rtmp://localhost/stream/" + name + " &";
       int status = system(cmd.c_str());
       if (status == 0) {
         cache[name].status = 1;
         cache[name].rtmp = ("rtmp://localhost:1935/stream/" + name);
       }
-
-      jsonresponse[name] = json::value::string(name);
-      jsonresponse["url"] = json::value::string(cache[name].url);
-      jsonresponse["rtmp"] = json::value::string(cache[name].rtmp);
-      jsonresponse["rtsp"] = json::value::string(cache[name].rtsp);
     }
+    jsonresponse[name] = json::value::string(name);
+    jsonresponse["url"] = json::value::string(cache[name].url);
+    jsonresponse["rtmp"] = json::value::string(cache[name].rtmp);
+    jsonresponse["rtsp"] = json::value::string(cache[name].rtsp);
   }
   message.reply(status_codes::OK, jsonresponse);
 }
@@ -89,7 +87,7 @@ void handler::handle_post_stream(http_request message) {
       std::string cmd = "wget " + url + " -P " + "/var/www/";
       int status = system(cmd.c_str());
       if (status == 0) {
-        
+
         std::string filename = url.substr(url.find_last_of("/\\") + 1);
         std::string filepath = "/var/www/" + filename;
         std::cout << "path: " << filepath << std::endl;
